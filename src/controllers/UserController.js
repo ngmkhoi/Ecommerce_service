@@ -108,25 +108,58 @@ const updateUser = async (req, res) => {
 const deleteUser = async (req, res) => {
     try {
         const userId = req.params.id
-
-        if (!mongoose.isValidObjectId(userId)) {
+        if(!userId){
             return res.status(400).json({ 
                 status: 'ERR',
-                message: 'ID không hợp lệ' 
+                message: 'ID không tồn tại' 
             });
         }
-
-        const response = await UserService.deleteUser(userId);
-
-        return res.status(200).json(response);
-    } catch (err) {
-        console.error(`[DELETE USER] Lỗi khi xoá người dùng với ID: ${req.params.id}`, err)
-        return res.status(500).json({ 
+        const response = await UserService.deleteUser(userId)
+        return res.status(200).json(response)
+    } catch (e) {
+        console.error(`[DELETE USER] Lỗi khi xoá người dùng với ID: ${req.params.id}`, e);
+        return res.status(500).json({
             status: 'ERR',
             message: 'Đã xảy ra lỗi trong quá trình xoá người dùng',
-            error: err.message
+            error: e.message
         });
     }
-}
+};
 
-module.exports = { createUser, loginUser, updateUser, deleteUser };
+const getAllUser = async (req, res) => {
+    try {
+        const response = await UserService.getAllUser();
+        return res.status(200).json(response);
+    } catch (e) {
+        console.error(`[GET ALL USER] Lỗi khi lấy danh sách người dùng:`, e);
+        return res.status(500).json({
+            status: 'ERR',
+            message: 'Đã xảy ra lỗi trong quá trình lấy danh sách người dùng',
+            error: e.message
+        });
+    }
+};
+
+const getDetailUser = async (req, res) => {
+    try {
+        const userId = req.params.id
+        if(!userId){
+            return res.status(400).json({ 
+                status: 'ERR',
+                message: 'ID không tồn tại' 
+            });
+        }
+        const response = await UserService.getDetailUser(userId)
+        return res.status(200).json(response)
+    } catch (e) {
+        console.error(`[DELETE USER] Lỗi khi sửa thông tin với ID: ${req.params.id}`, e);
+        return res.status(500).json({
+            status: 'ERR',
+            message: 'Đã xảy ra lỗi trong quá trình sửa người dùng',
+            error: e.message
+        });
+    }
+};
+
+
+module.exports = { createUser, loginUser, updateUser, deleteUser, getAllUser, getDetailUser};

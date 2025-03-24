@@ -25,6 +25,8 @@ const generateRefreshToken = (payload) => {
     return generateToken(payload, secretKey, '31536000s'); // 1 năm
 };
 
+//Role chỉ admin mới xoá được tài khoản
+
 module.exports = {
     generateAccessToken,
     generateRefreshToken

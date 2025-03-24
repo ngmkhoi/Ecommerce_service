@@ -161,7 +161,6 @@ const deleteUser = (id) => {
             }
 
             const checkUser = await User.findOne({ _id: id })
-            console.log(checkUser)
 
             if (!checkUser) {
                 return resolve({
@@ -176,12 +175,12 @@ const deleteUser = (id) => {
                     status: 'ERR',
                     message: 'Người dùng không tồn tại hoặc đã bị xoá trước đó'
                 })
+            }else{
+                resolve({
+                    status: 'OK',
+                    message: 'Xoá người dùng thành công'
+                })
             }
-
-            resolve({
-                status: 'OK',
-                message: 'Xoá người dùng thành công'
-            })
         } catch (e) {
             console.error('Lỗi trong UserService:', e)
             reject({
@@ -193,9 +192,60 @@ const deleteUser = (id) => {
     })
 }
 
+const getAllUser = () => {
+    return new Promise(async (resolve, reject) => {
+        try {
+            const allUser = await User.find()
+            resolve({
+                status: 'OK',
+                message: 'Lấy danh sách người dùng thành công',
+                data: allUser
+            })
+        } catch (e) {
+            console.error('Lỗi trong UserService:', e)
+            reject({
+                status: 'ERR',
+                message: 'Đã xảy ra lỗi trong quá trình lấy danh sách người dùng',
+                error: e.message
+            })
+        }
+    })
+}
+
+const getDetailUser = (id) => {
+    return new Promise(async (resolve, reject) => {
+        try {
+
+            const user = await User.findOne({ _id: id })
+
+            if (!user) {
+                return resolve({
+                    status: 'ERR',
+                    message: 'ID không tồn tại',
+                })
+            }
+                resolve({
+                    status: 'OK',
+                    message: 'thành công',
+                    data: user
+                })
+        } catch (e) {
+            console.error('Lỗi trong UserService:', e)
+            reject({
+                status: 'ERR',
+                message: 'Đã xảy ra lỗi trong quá trình lấy thông tin người dùng',
+                error: e.message
+            })
+        }
+    })
+}
+
+
 module.exports = {
     createUser,
     loginUser,
     updateUser,
-    deleteUser
+    deleteUser,
+    getAllUser,
+    getDetailUser
 }
