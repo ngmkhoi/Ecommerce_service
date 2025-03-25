@@ -118,19 +118,35 @@ const deleteProduct = (id) => {
     })
 }
 
-const getAllProduct = (limit = 8, page = 0) => {
+const getAllProduct = (limit, page, sort, filter) => {
     return new Promise(async (resolve, reject) => {
         try {
             const totalProduct = await Product.countDocuments()
-            const allProduct = await Product.find().limit(limit).skip(limit * page)
-            resolve({
-                status: 'OK',
-                message: 'Lấy danh sách sản phẩm thành công',
-                data: allProduct,
-                total: totalProduct,
-                pageCurrent: Number(page + 1),
-                totalPage: Math.ceil(totalProduct / limit)
-            })
+            if(filter){
+                const lable = filter[0]
+                const allProductFilter = await Product.find({ [lable]: {'$regex': filter[1]}}).limit(limit).skip(limit * page)
+                resolve({
+                    status: 'OK',
+                    message: 'Lấy danh sách sản phẩm thành công',
+                    data: allProductFilter,
+                    total: totalProduct,
+                    pageCurrent: Number(page + 1),
+                    totalPage: Math.ceil(totalProduct / limit)
+                })
+            }
+            if(sort){
+                const objectSort = {}
+                objectSort[sort[1]] = sort[0]
+                const allProductSort = await Product.find().limit(limit).skip(limit * page).sort(objectSort)
+                resolve({
+                    status: 'OK',
+                    message: 'Lấy danh sách sản phẩm thành công',
+                    data: allProductSort,
+                    total: totalProduct,
+                    pageCurrent: Number(page + 1),
+                    totalPage: Math.ceil(totalProduct / limit)
+                })
+            }
         } catch (e) {
             console.error('Lỗi trong ProductService:', e)
             reject({
