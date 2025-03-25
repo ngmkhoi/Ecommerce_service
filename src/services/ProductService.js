@@ -118,14 +118,18 @@ const deleteProduct = (id) => {
     })
 }
 
-const getAllProduct = () => {
+const getAllProduct = (limit = 8, page = 0) => {
     return new Promise(async (resolve, reject) => {
         try {
-            const allProduct = await Product.find()
+            const totalProduct = await Product.countDocuments()
+            const allProduct = await Product.find().limit(limit).skip(limit * page)
             resolve({
                 status: 'OK',
                 message: 'Lấy danh sách sản phẩm thành công',
-                data: allProduct
+                data: allProduct,
+                total: totalProduct,
+                pageCurrent: Number(page + 1),
+                totalPage: Math.ceil(totalProduct / limit)
             })
         } catch (e) {
             console.error('Lỗi trong ProductService:', e)
