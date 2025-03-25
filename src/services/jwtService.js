@@ -3,11 +3,11 @@ const dotenv = require('dotenv');
 dotenv.config();
 
 const generateAccessToken = (payload) => {
-    return jwt.sign(payload, process.env.ACCESS_TOKEN_SECRET, { expiresIn: '30s' });
+    return jwt.sign(...payload, process.env.ACCESS_TOKEN_SECRET, { expiresIn: '30s' });
 };
 
 const generateRefreshToken = (payload) => {
-    return jwt.sign(payload, process.env.REFRESH_TOKEN_SECRET, { expiresIn: '365d' });
+    return jwt.sign(...payload, process.env.REFRESH_TOKEN_SECRET, { expiresIn: '365d' });
 };
 
 const refreshTokenJwtService = (token) => {
