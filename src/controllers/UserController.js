@@ -11,7 +11,7 @@ const createUser = async (req, res) => {
         const reg = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
         const isCheckEmail = reg.test(email);
 
-        if ( !name ||!email || !password || !confirmPassword || !phone) {
+        if (!email || !password || !confirmPassword) {
             return res.status(400).json({ 
                 status: 'ERR',
                 message: 'Vui lòng nhập đầy đủ thông tin' 
