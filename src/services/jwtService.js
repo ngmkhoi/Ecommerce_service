@@ -2,32 +2,40 @@ const jwt = require('jsonwebtoken');
 const dotenv = require('dotenv');
 dotenv.config();
 
-// 🔧 Hàm chung để tạo token
-const generateToken = (payload, secret, expiresIn) => {
-    try {
-        if (process.env.NODE_ENV === 'development') {
-            console.log('Payload:', payload);
-        }
-        return jwt.sign(payload, secret, { expiresIn });
-    } catch (error) {
-        console.error('Lỗi khi tạo token:', error.message);
-        throw new Error('Không thể tạo token');
-    }
-};
-
 const generateAccessToken = (payload) => {
-    const secretKey = process.env.ACCESS_TOKEN_SECRET || 'default_access_secret';
-    return generateToken(payload, secretKey, '1h');
+    return jwt.sign(payload, process.env.ACCESS_TOKEN_SECRET, { expiresIn: '30s' });
 };
 
 const generateRefreshToken = (payload) => {
-    const secretKey = process.env.REFRESH_TOKEN_SECRET || 'default_refresh_secret';
-    return generateToken(payload, secretKey, '31536000s'); // 1 năm
+    return jwt.sign(payload, process.env.REFRESH_TOKEN_SECRET, { expiresIn: '365d' });
 };
 
-//Role chỉ admin mới xoá được tài khoản
+const refreshTokenJwtService = (token) => {
+    return new Promise((resolve, reject) => {
+        jwt.verify(token, process.env.REFRESH_TOKEN_SECRET, (err, user) => {
+            if (err) {
+                console.error('Lỗi xác minh token:', err);
+                return resolve({
+                    status: 'ERR',
+                    message: 'Token không hợp lệ'
+                });
+            }
+
+            const { id, isAdmin, email } = user;
+            const access_token = generateAccessToken({ id, isAdmin, email });
+
+            resolve({
+                status: 'OK',
+                message: 'Token hợp lệ',
+                access_token
+            });
+        });
+    });
+};
+
 
 module.exports = {
     generateAccessToken,
-    generateRefreshToken
+    generateRefreshToken,
+    refreshTokenJwtService
 };

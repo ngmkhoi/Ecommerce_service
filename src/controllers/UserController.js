@@ -1,5 +1,7 @@
 const UserService = require('../services/UserService');
 const jwt = require('jsonwebtoken');
+const refreshTokenJwtService = require('../services/jwtService');
+const jwtService = require('../services/jwtService');
 const mongoose = require('mongoose')
 
 
@@ -161,5 +163,24 @@ const getDetailUser = async (req, res) => {
     }
 };
 
+const refreshToken = async (req, res) => {
+    try {
+        const token = req.headers.token.split(' ')[1]
+        if(!token){
+            return res.status(400).json({ 
+                status: 'ERR',
+                message: 'token không tồn tại' 
+            });
+        }
+        const response = await jwtService.refreshTokenJwtService(token)
+        return res.status(200).json(response)
+    } catch (e) {
+        return res.status(500).json({
+            status: 'ERR',
+            message: 'Lỗi trong quá trình xử lý refresh token',
+            error: e.message
+        });
+    }
+};
 
-module.exports = { createUser, loginUser, updateUser, deleteUser, getAllUser, getDetailUser};
+module.exports = { createUser, loginUser, updateUser, deleteUser, getAllUser, getDetailUser, refreshToken };
