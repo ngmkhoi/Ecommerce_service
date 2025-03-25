@@ -33,9 +33,13 @@ const createUser = async (req, res) => {
                 message: 'Mật khẩu không khớp' 
             });
         }
-        const response = await UserService.createUser(req.body);
-        return res.status(201).json(response);
-
+        const response = await UserService.createUser(req.body)
+        const {refresh_token, ...newResponse} = response
+        res.cookies('refresh_token', refresh_token, {
+            httpOnly: true,
+            Secure: true,
+        })
+        return res.status(201).json(newResponse);
     } catch (err) {
         console.error('Lỗi khi tạo người dùng:', err);
         return res.status(500).json({ 
@@ -161,7 +165,7 @@ const getDetailUser = async (req, res) => {
 
 const refreshToken = async (req, res) => {
     try {
-        const token = req.headers.token.split(' ')[1]
+        const token = req.cookies.refresh_token.token
         if(!token){
             return res.status(400).json({ 
                 status: 'ERR',
