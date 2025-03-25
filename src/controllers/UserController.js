@@ -7,11 +7,11 @@ const mongoose = require('mongoose')
 
 const createUser = async (req, res) => {
     try {
-        const { name, email, password, confirmPassword, phone } = req.body;
+        const {email, password} = req.body;
         const reg = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
         const isCheckEmail = reg.test(email);
 
-        if (!name || !email || !password || !confirmPassword || !phone) {
+        if (!email || !password) {
             return res.status(400).json({ 
                 status: 'ERR',
                 message: 'Vui lòng nhập đầy đủ thông tin' 
@@ -25,11 +25,6 @@ const createUser = async (req, res) => {
             return res.status(400).json({ 
                 status: 'ERR',
                 message: 'Mật khẩu phải có ít nhất 6 ký tự' 
-            });
-        } else if (password !== confirmPassword) {
-            return res.status(400).json({ 
-                status: 'ERR',
-                message: 'Mật khẩu không khớp' 
             });
         }
         const response = await UserService.createUser(req.body);
