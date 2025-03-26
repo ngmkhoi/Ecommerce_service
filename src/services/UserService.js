@@ -6,7 +6,7 @@ const mongoose = require('mongoose')
 
 const createUser = async (newUser) => {
     return new Promise(async (resolve, reject) => {
-        const { name, email, password, confirmPassword, phone } = newUser
+        const { email, password, confirmPassword } = newUser
 
         try {
             const checkUser = await User.findOne({ email })
@@ -35,7 +35,6 @@ const createUser = async (newUser) => {
                 name,
                 email,
                 password: hash,
-                phone,
                 access_token, 
                 refresh_token  
             });
