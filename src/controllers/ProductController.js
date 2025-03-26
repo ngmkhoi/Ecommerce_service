@@ -88,8 +88,24 @@ const deleteProduct = async (req, res) => {
 
 const getAllProduct = async (req, res) => {
     try {
-        const {limit ,page, sort, filter} = req.query
-        const response = await ProductService.getAllProduct(Number(limit) || 8 ,Number(page) || 0, sort, filter);
+        const { limit, page, sort, filter } = req.query;
+
+        const parsedLimit = Number(limit);
+        const parsedPage = Number(page);
+
+        const finalLimit = isNaN(parsedLimit) || parsedLimit <= 0 ? 8 : parsedLimit;
+        const finalPage = isNaN(parsedPage) || parsedPage < 0 ? 0 : parsedPage;
+
+        const sortArray = typeof sort === 'string' ? sort.split(',') : sort || null;
+        const filterArray = Array.isArray(filter) ? filter : typeof filter === 'string' ? filter.split(',') : null;
+
+        const response = await ProductService.getAllProduct(
+            finalLimit,
+            finalPage,
+            sortArray,
+            filterArray
+        );
+
         return res.status(200).json(response);
     } catch (e) {
         console.error(`[GET ALL PRODUCT] Lỗi khi lấy danh sách sản phẩm:`, e);
@@ -100,5 +116,7 @@ const getAllProduct = async (req, res) => {
         });
     }
 };
+
+
 
 module.exports = { createProduct, updateProduct, getDetailProduct, deleteProduct, getAllProduct };

@@ -121,42 +121,37 @@ const deleteProduct = (id) => {
 const getAllProduct = (limit, page, sort, filter) => {
     return new Promise(async (resolve, reject) => {
         try {
-            const totalProduct = await Product.countDocuments()
-            if(filter){
-                const lable = filter[0]
-                const allProductFilter = await Product.find({ [lable]: {'$regex': filter[1]}}).limit(limit).skip(limit * page)
-                resolve({
-                    status: 'OK',
-                    message: 'Lấy danh sách sản phẩm thành công',
-                    data: allProductFilter,
-                    total: totalProduct,
-                    pageCurrent: Number(page + 1),
-                    totalPage: Math.ceil(totalProduct / limit)
-                })
-            }
-            if(sort){
-                const objectSort = {}
-                objectSort[sort[1]] = sort[0]
-                const allProductSort = await Product.find().limit(limit).skip(limit * page).sort(objectSort)
-                resolve({
-                    status: 'OK',
-                    message: 'Lấy danh sách sản phẩm thành công',
-                    data: allProductSort,
-                    total: totalProduct,
-                    pageCurrent: Number(page + 1),
-                    totalPage: Math.ceil(totalProduct / limit)
-                })
-            }
+            const query = filter
+                ? { [filter[0]]: { '$regex': filter[1] } }
+                : {};
+
+            const totalProduct = await Product.countDocuments(query);
+
+            const allProducts = await Product
+                .find(query)
+                .limit(limit)
+                .skip(limit * (page - 1));
+
+            resolve({
+                status: 'OK',
+                message: 'Lấy danh sách sản phẩm thành công',
+                data: allProducts,
+                total: totalProduct,
+                pageCurrent: Number(page),
+                totalPage: Math.ceil(totalProduct / limit)
+            });
         } catch (e) {
-            console.error('Lỗi trong ProductService:', e)
+            console.error('Lỗi trong ProductService:', e);
             reject({
                 status: 'ERR',
                 message: 'Đã xảy ra lỗi trong quá trình lấy danh sách sản phẩm',
                 error: e.message
-            })
+            });
         }
-    })
-}
+    });
+};
+
+
 
 const getDetailProduct = (id) => {
     return new Promise(async (resolve, reject) => {
